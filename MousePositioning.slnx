@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="MousePositioning.vcxproj" Id="6a5c1c38-626c-4b31-bfd6-83584a871f42" />
+  <Project Path="TestMousePositioning/TestMousePositioning.vcxproj" Id="063bb12e-3169-491e-bc29-b29f189b77b0" />
+</Solution>

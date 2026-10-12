@@ -1,0 +1,3 @@
+#include "resource.h"
+
+IDC_BIG_CURSOR CURSOR "resource\\aero_arrow_xl.cur"
