@@ -18,25 +18,25 @@
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MousePositioning.h">
+    <ClInclude Include="ShakeCursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mp_internal.h">
+    <ClInclude Include="sc_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mp_core.h">
+    <ClInclude Include="sc_core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mp_detect.h">
+    <ClInclude Include="sc_detect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mp_hook.h">
+    <ClInclude Include="sc_hook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mp_monitor.h">
+    <ClInclude Include="sc_monitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mp_visual.h">
+    <ClInclude Include="sc_visual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -50,19 +50,19 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mp_core.cpp">
+    <ClCompile Include="sc_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mp_detect.cpp">
+    <ClCompile Include="sc_detect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mp_hook.cpp">
+    <ClCompile Include="sc_hook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mp_monitor.cpp">
+    <ClCompile Include="sc_monitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mp_visual.cpp">
+    <ClCompile Include="sc_visual.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
@@ -70,7 +70,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MousePositioning.rc">
+    <ResourceCompile Include="ShakeCursor.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

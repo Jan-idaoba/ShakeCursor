@@ -1,16 +1,16 @@
 #include "pch.h"
 #include <new>
-#include "mp_internal.h"
-#include "mp_core.h"
-#include "mp_hook.h"
-#include "mp_monitor.h"
-#include "mp_visual.h"
+#include "sc_internal.h"
+#include "sc_core.h"
+#include "sc_hook.h"
+#include "sc_monitor.h"
+#include "sc_visual.h"
 
-MPState g_state = {};
+SCState g_state = {};
 // config
-static const MP_Config MP_DEFAULT_CONFIG =
+static const SC_Config SC_DEFAULT_CONFIG =
 {
-    sizeof(MP_Config),  // cbSize
+    sizeof(SC_Config),  // cbSize
     130,    // shakeThresholdPixels
     4,      // shakePatternLength
     100,    // shakeMinIntervalMs
@@ -23,20 +23,20 @@ static const MP_Config MP_DEFAULT_CONFIG =
 };
 
 // cursorSize 上限
-static const int MP_CURSOR_SIZE_MAX = 512;
+static const int SC_CURSOR_SIZE_MAX = 512;
 
-void ApplyConfig(const MP_Config* config) 
+void ApplyConfig(const SC_Config* config) 
 {
-    const MP_Config* c = config ? config : &MP_DEFAULT_CONFIG;
+    const SC_Config* c = config ? config : &SC_DEFAULT_CONFIG;
 
-    g_state.shakeThresholdPixels = c->shakeThresholdPixels > 0 ? c->shakeThresholdPixels : MP_DEFAULT_CONFIG.shakeThresholdPixels;
-    g_state.shakePatternLength   = c->shakePatternLength   > 0 ? c->shakePatternLength   : MP_DEFAULT_CONFIG.shakePatternLength;
-    g_state.shakeMinIntervalMs   = c->shakeMinIntervalMs   > 0 ? c->shakeMinIntervalMs   : MP_DEFAULT_CONFIG.shakeMinIntervalMs;
-    g_state.shakeMaxIntervalMs   = c->shakeMaxIntervalMs   > 0 ? c->shakeMaxIntervalMs   : MP_DEFAULT_CONFIG.shakeMaxIntervalMs;
-    g_state.cursorSize           = c->cursorSize           > 0 ? c->cursorSize           : MP_DEFAULT_CONFIG.cursorSize;
-    g_state.cursorResetTimeoutMs = c->cursorResetTimeoutMs  > 0 ? c->cursorResetTimeoutMs  : MP_DEFAULT_CONFIG.cursorResetTimeoutMs;
-    g_state.edgeZoneWidth        = c->edgeZoneWidth        > 0 ? c->edgeZoneWidth        : MP_DEFAULT_CONFIG.edgeZoneWidth;
-    g_state.crossScreenOffset    = c->crossScreenOffset    > 0 ? c->crossScreenOffset    : MP_DEFAULT_CONFIG.crossScreenOffset;
+    g_state.shakeThresholdPixels = c->shakeThresholdPixels > 0 ? c->shakeThresholdPixels : SC_DEFAULT_CONFIG.shakeThresholdPixels;
+    g_state.shakePatternLength   = c->shakePatternLength   > 0 ? c->shakePatternLength   : SC_DEFAULT_CONFIG.shakePatternLength;
+    g_state.shakeMinIntervalMs   = c->shakeMinIntervalMs   > 0 ? c->shakeMinIntervalMs   : SC_DEFAULT_CONFIG.shakeMinIntervalMs;
+    g_state.shakeMaxIntervalMs   = c->shakeMaxIntervalMs   > 0 ? c->shakeMaxIntervalMs   : SC_DEFAULT_CONFIG.shakeMaxIntervalMs;
+    g_state.cursorSize           = c->cursorSize           > 0 ? c->cursorSize           : SC_DEFAULT_CONFIG.cursorSize;
+    g_state.cursorResetTimeoutMs = c->cursorResetTimeoutMs  > 0 ? c->cursorResetTimeoutMs  : SC_DEFAULT_CONFIG.cursorResetTimeoutMs;
+    g_state.edgeZoneWidth        = c->edgeZoneWidth        > 0 ? c->edgeZoneWidth        : SC_DEFAULT_CONFIG.edgeZoneWidth;
+    g_state.crossScreenOffset    = c->crossScreenOffset    > 0 ? c->crossScreenOffset    : SC_DEFAULT_CONFIG.crossScreenOffset;
 
     if (c->cursorFilePath && c->cursorFilePath[0] != L'\0')
     {
@@ -47,12 +47,12 @@ void ApplyConfig(const MP_Config* config)
     }
 
     if (g_state.shakeMaxIntervalMs <= g_state.shakeMinIntervalMs) {
-        g_state.shakeMinIntervalMs = MP_DEFAULT_CONFIG.shakeMinIntervalMs;
-        g_state.shakeMaxIntervalMs = MP_DEFAULT_CONFIG.shakeMaxIntervalMs;
+        g_state.shakeMinIntervalMs = SC_DEFAULT_CONFIG.shakeMinIntervalMs;
+        g_state.shakeMaxIntervalMs = SC_DEFAULT_CONFIG.shakeMaxIntervalMs;
     }
 
-    if (g_state.cursorSize > MP_CURSOR_SIZE_MAX) {
-        g_state.cursorSize = MP_CURSOR_SIZE_MAX;
+    if (g_state.cursorSize > SC_CURSOR_SIZE_MAX) {
+        g_state.cursorSize = SC_CURSOR_SIZE_MAX;
     }
 }
 
@@ -86,18 +86,18 @@ static DWORD WINAPI WorkerThreadProc(LPVOID /*lpParam*/)
     {
         switch (msg.message) 
         {
-        case WM_MP_ENABLE_POSITIONING:
-        case WM_MP_ENABLE_CROSSSCREEN:
+        case WM_SC_ENABLE_POSITIONING:
+        case WM_SC_ENABLE_CROSSSCREEN:
             HookUpdateState();
             break;
 
-        case WM_MP_SHAKE_DETECTED:
+        case WM_SC_SHAKE_DETECTED:
             if (g_state.enablePositioning && !g_state.cursorEnlarged) {
                 CursorEnlarge();
             }
             break;
 
-        case WM_MP_EDGE_HIT:
+        case WM_SC_EDGE_HIT:
             if (g_state.enableCrossScreen) {
                 int edgeIdx = (int)msg.lParam;
                 CrossScreenJump(edgeIdx);
@@ -106,7 +106,7 @@ static DWORD WINAPI WorkerThreadProc(LPVOID /*lpParam*/)
             }
             break;
 
-        case WM_MP_MONITORS_CHANGED:
+        case WM_SC_MONITORS_CHANGED:
             MonitorEnumerate();
             EdgeZoneRebuild();
             break;
@@ -127,13 +127,13 @@ static DWORD WINAPI WorkerThreadProc(LPVOID /*lpParam*/)
     return 0;
 }
 
-MOUSEPOS_API BOOL MP_Initialize(const MP_Config* config)
+SHAKECURSOR_API BOOL SC_Initialize(const SC_Config* config)
 {
     if (g_state.initialized)
         return FALSE;
 
     // cbSize 不匹配 return
-    if (config && config->cbSize != sizeof(MP_Config))
+    if (config && config->cbSize != sizeof(SC_Config))
         return FALSE;
 
     Gdiplus::GdiplusStartupInput gdiplusInput;
@@ -152,7 +152,7 @@ MOUSEPOS_API BOOL MP_Initialize(const MP_Config* config)
     return TRUE;
 }
 
-MOUSEPOS_API void MP_Uninitialize(void) 
+SHAKECURSOR_API void SC_Uninitialize(void) 
 {
     if (!g_state.initialized)
         return;
@@ -169,39 +169,39 @@ MOUSEPOS_API void MP_Uninitialize(void)
         Gdiplus::GdiplusShutdown(g_state.gdiplusToken);
     }
 
-    g_state.~MPState();
-    new (&g_state) MPState{};
+    g_state.~SCState();
+    new (&g_state) SCState{};
 }
 
-MOUSEPOS_API void MP_EnableMousePositioning(BOOL enable)
+SHAKECURSOR_API void SC_EnableShakeCursor(BOOL enable)
 {
     if (!g_state.initialized)
         return;
 
     g_state.enablePositioning = enable;
-    PostThreadMessage(g_state.workerThreadId, WM_MP_ENABLE_POSITIONING, enable, 0);
+    PostThreadMessage(g_state.workerThreadId, WM_SC_ENABLE_POSITIONING, enable, 0);
 }
 
-MOUSEPOS_API void MP_EnableAutoCrossScreen(BOOL enable)
+SHAKECURSOR_API void SC_EnableAutoCrossScreen(BOOL enable)
 {
     if (!g_state.initialized)
         return;
 
     g_state.enableCrossScreen = enable;
-    PostThreadMessage(g_state.workerThreadId, WM_MP_ENABLE_CROSSSCREEN, enable, 0);
+    PostThreadMessage(g_state.workerThreadId, WM_SC_ENABLE_CROSSSCREEN, enable, 0);
 }
 
-MOUSEPOS_API BOOL MP_IsMousePositioningEnabled(void)
+SHAKECURSOR_API BOOL SC_IsShakeCursorEnabled(void)
 {
     return g_state.enablePositioning;
 }
 
-MOUSEPOS_API BOOL MP_IsAutoCrossScreenEnabled(void)
+SHAKECURSOR_API BOOL SC_IsAutoCrossScreenEnabled(void)
 {
     return g_state.enableCrossScreen;
 }
 
-MOUSEPOS_API void MP_SetCallback(MP_Callback callback, LPVOID userData)
+SHAKECURSOR_API void SC_SetCallback(SC_Callback callback, LPVOID userData)
 {
     AcquireSRWLockExclusive(&g_state.callbackLock);
     g_state.callback = callback;

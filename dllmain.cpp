@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "mp_internal.h"
+#include "sc_internal.h"
 
 HINSTANCE g_hDllInstance = NULL;
 

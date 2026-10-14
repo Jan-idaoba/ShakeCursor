@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "mp_internal.h"
-#include "mp_hook.h"
-#include "mp_detect.h"
+#include "sc_internal.h"
+#include "sc_hook.h"
+#include "sc_detect.h"
 
 static ShakeDetector g_shakeDetector;
 static bool g_shakeDetectorConfigured = false;
@@ -64,7 +64,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
                     pt.y >= ez.zoneRect.top    && pt.y <= ez.zoneRect.bottom)
                 {
                     PostThreadMessage(g_state.workerThreadId,
-                        WM_MP_EDGE_HIT, MAKEWPARAM(pt.x, pt.y), (LPARAM)i);
+                        WM_SC_EDGE_HIT, MAKEWPARAM(pt.x, pt.y), (LPARAM)i);
                     break;
                 }
             }
@@ -75,7 +75,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
             g_shakeDetector.Feed(pt, time);
             if (g_shakeDetector.IsShakeDetected()) 
             {
-                PostThreadMessage(g_state.workerThreadId, WM_MP_SHAKE_DETECTED, 0, 0);
+                PostThreadMessage(g_state.workerThreadId, WM_SC_SHAKE_DETECTED, 0, 0);
             }
         }
     }

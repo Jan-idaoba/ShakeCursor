@@ -1,15 +1,15 @@
 #include "pch.h"
-#include "mp_internal.h"
-#include "mp_visual.h"
+#include "sc_internal.h"
+#include "sc_visual.h"
 #include "resource.h"
 
-static const WCHAR* NOTIFY_CLASS_NAME = L"MP_NotifyWnd_{A7B3C9D1}";
+static const WCHAR* NOTIFY_CLASS_NAME = L"SC_NotifyWnd_{A7B3C9D1}";
 
 static LRESULT CALLBACK NotifyWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (msg == WM_DISPLAYCHANGE)
     {
-        PostThreadMessage(g_state.workerThreadId, WM_MP_MONITORS_CHANGED, 0, 0);
+        PostThreadMessage(g_state.workerThreadId, WM_SC_MONITORS_CHANGED, 0, 0);
         return 0;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -60,8 +60,8 @@ static const struct
     { 32649, IDC_HAND,        L"Hand"         },  // OCR_HAND
     { 32650, IDC_APPSTARTING, L"AppStarting"  },  // OCR_APPSTARTING
 };
-static_assert(_countof(SYSTEM_CURSORS) == MP_SYSTEM_CURSOR_COUNT,
-    "SYSTEM_CURSORS[] count must match MPState::bigCursors[] count");
+static_assert(_countof(SYSTEM_CURSORS) == SC_SYSTEM_CURSOR_COUNT,
+    "SYSTEM_CURSORS[] count must match SCState::bigCursors[] count");
 
 
 static void ApplyUnsharpMask(BYTE* pixels, int w, int h, float amount) 
@@ -288,7 +288,7 @@ void LoadBigCursor(void)
 
 void DestroyCursorCache(void)
 {
-    for (int i = 0; i < MP_SYSTEM_CURSOR_COUNT; i++) {
+    for (int i = 0; i < SC_SYSTEM_CURSOR_COUNT; i++) {
         if (g_state.bigCursors[i]) {
             DestroyCursor(g_state.bigCursors[i]);
             g_state.bigCursors[i] = NULL;
@@ -300,7 +300,7 @@ void DestroyCursorCache(void)
 static void BuildCursorCache(void)
 {
     if (g_state.cursorCacheBuilt) return;
-    for (int i = 0; i < MP_SYSTEM_CURSOR_COUNT; i++) {
+    for (int i = 0; i < SC_SYSTEM_CURSOR_COUNT; i++) {
         g_state.bigCursors[i] = LoadBigCursorCopy(
             SYSTEM_CURSORS[i].loadCursorName,
             SYSTEM_CURSORS[i].regValueName);
@@ -315,7 +315,7 @@ void CursorEnlarge(void)
 
     BuildCursorCache();
 
-    for (int i = 0; i < MP_SYSTEM_CURSOR_COUNT; i++)
+    for (int i = 0; i < SC_SYSTEM_CURSOR_COUNT; i++)
     {
         if (!g_state.bigCursors[i]) 
             continue;
@@ -328,7 +328,7 @@ void CursorEnlarge(void)
 
     g_state.cursorEnlarged = TRUE;
 
-    FireCallback(MP_EVENT_CURSOR_ENLARGED, 0);
+    FireCallback(SC_EVENT_CURSOR_ENLARGED, 0);
 
     if (g_state.cursorResetTimer) {
         KillTimer(NULL, g_state.cursorResetTimer);
@@ -344,7 +344,7 @@ void CursorRestore(void)
     SystemParametersInfo(SPI_SETCURSORS, 0, 0, SPIF_SENDWININICHANGE);
     g_state.cursorEnlarged = FALSE;
 
-    FireCallback(MP_EVENT_CURSOR_RESTORED, 0);
+    FireCallback(SC_EVENT_CURSOR_RESTORED, 0);
 }
 
 void CrossScreenJump(int edgeIndex) 
@@ -357,12 +357,12 @@ void CrossScreenJump(int edgeIndex)
 
     CursorEnlarge();
 
-    FireCallback(MP_EVENT_AUTO_CROSS_SCREEN, (LPARAM)edgeIndex);
+    FireCallback(SC_EVENT_AUTO_CROSS_SCREEN, (LPARAM)edgeIndex);
 }
 
 void FireCallback(int eventType, LPARAM lParam)
 {
-    MP_Callback cb;
+    SC_Callback cb;
     LPVOID      ud;
     AcquireSRWLockShared(&g_state.callbackLock);
     cb = g_state.callback;

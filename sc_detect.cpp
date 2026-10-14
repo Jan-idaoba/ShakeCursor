@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "mp_detect.h"
+#include "sc_detect.h"
 
 void ShakeDetector::Configure(int thresholdPixels, int patternLength,
                               int minIntervalMs, int maxIntervalMs)

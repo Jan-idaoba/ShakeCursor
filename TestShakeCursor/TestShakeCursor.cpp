@@ -1,18 +1,18 @@
 #include <Windows.h>
 #include <cstdio>
-#include "../MousePositioning.h"
+#include "../ShakeCursor.h"
 
-static void CALLBACK OnMPEvent(int eventType, LPARAM lParam, LPVOID /*userData*/) 
+static void CALLBACK OnSCEvent(int eventType, LPARAM lParam, LPVOID /*userData*/) 
 {
     switch (eventType) 
     {
-    case MP_EVENT_CURSOR_ENLARGED:
+    case SC_EVENT_CURSOR_ENLARGED:
         printf("[Event] Cursor enlarged (shake detected)\n");
         break;
-    case MP_EVENT_CURSOR_RESTORED:
+    case SC_EVENT_CURSOR_RESTORED:
         printf("[Event] Cursor restored\n");
         break;
-    case MP_EVENT_AUTO_CROSS_SCREEN:
+    case SC_EVENT_AUTO_CROSS_SCREEN:
         printf("[Event] Auto cross-screen jump, edge index = %lld\n", (long long)lParam);
         break;
     default:
@@ -23,16 +23,16 @@ static void CALLBACK OnMPEvent(int eventType, LPARAM lParam, LPVOID /*userData*/
 
 static void PrintStatus() 
 {
-    printf("  Mouse Positioning: %s\n", MP_IsMousePositioningEnabled() ? "ON" : "OFF");
-    printf("  Auto Cross-Screen: %s\n", MP_IsAutoCrossScreenEnabled() ? "ON" : "OFF");
+    printf("  Shake Cursor: %s\n", SC_IsShakeCursorEnabled() ? "ON" : "OFF");
+    printf("  Auto Cross-Screen: %s\n", SC_IsAutoCrossScreenEnabled() ? "ON" : "OFF");
 }
 
 static void PrintMenu() 
 {
     printf("\n========================================\n");
-    printf("  MousePositioning DLL Test\n");
+    printf("  ShakeCursor DLL Test\n");
     printf("========================================\n");
-    printf("  1 - Toggle Mouse Positioning (shake-to-find)\n");
+    printf("  1 - Toggle Shake Cursor (shake-to-find)\n");
     printf("  2 - Toggle Auto Cross-Screen\n");
     printf("  3 - Show current status\n");
     printf("  Q - Quit\n");
@@ -43,9 +43,9 @@ static void PrintMenu()
 
 int main() 
 {
-    printf("Initializing MousePositioning DLL...\n");
+    printf("Initializing ShakeCursor DLL...\n");
 
-    MP_Config config = {};
+    SC_Config config = {};
     config.cbSize               = sizeof(config);
     config.shakeThresholdPixels = 130;
     config.shakePatternLength   = 4;
@@ -57,18 +57,18 @@ int main()
     config.crossScreenOffset    = 40;
     config.cursorFilePath       = NULL;
 
-    BOOL ok = MP_Initialize(&config);
+    BOOL ok = SC_Initialize(&config);
     if (!ok) 
     {
-        printf("MP_Initialize failed!\n");
+        printf("SC_Initialize failed!\n");
         return 1;
     }
-    printf("MP_Initialize OK\n");
+    printf("SC_Initialize OK\n");
 
-    MP_SetCallback(OnMPEvent, NULL);
+    SC_SetCallback(OnSCEvent, NULL);
 
-    BOOL ok2 = MP_Initialize(&config);
-    printf("Double MP_Initialize returned: %s (expected: FALSE)\n", ok2 ? "TRUE" : "FALSE");
+    BOOL ok2 = SC_Initialize(&config);
+    printf("Double SC_Initialize returned: %s (expected: FALSE)\n", ok2 ? "TRUE" : "FALSE");
 
     PrintMenu();
 
@@ -82,27 +82,27 @@ int main()
         {
         case '1':
         {
-            BOOL cur = MP_IsMousePositioningEnabled();
-            MP_EnableMousePositioning(!cur);
+            BOOL cur = SC_IsShakeCursorEnabled();
+            SC_EnableShakeCursor(!cur);
 
             Sleep(50);
-            printf("Mouse Positioning: %s -> %s\n",
+            printf("Shake Cursor: %s -> %s\n",
                 cur ? "ON" : "OFF",
-                MP_IsMousePositioningEnabled() ? "ON" : "OFF");
-            if (MP_IsMousePositioningEnabled()) {
+                SC_IsShakeCursorEnabled() ? "ON" : "OFF");
+            if (SC_IsShakeCursorEnabled()) {
                 printf("  >>> Shake your mouse rapidly back and forth to test! <<<\n");
             }
             break;
         }
         case '2': 
         {
-            BOOL cur = MP_IsAutoCrossScreenEnabled();
-            MP_EnableAutoCrossScreen(!cur);
+            BOOL cur = SC_IsAutoCrossScreenEnabled();
+            SC_EnableAutoCrossScreen(!cur);
             Sleep(50);
             printf("Auto Cross-Screen: %s -> %s\n",
                 cur ? "ON" : "OFF",
-                MP_IsAutoCrossScreenEnabled() ? "ON" : "OFF");
-            if (MP_IsAutoCrossScreenEnabled()) {
+                SC_IsAutoCrossScreenEnabled() ? "ON" : "OFF");
+            if (SC_IsAutoCrossScreenEnabled()) {
                 printf("  >>> Move mouse to monitor edge dead zones to test! <<<\n");
             }
             break;
@@ -121,11 +121,11 @@ int main()
     }
 
     printf("\nUninitializing...\n");
-    MP_Uninitialize();
+    SC_Uninitialize();
     printf("Done. Bye!\n");
 
-    MP_Uninitialize();
-    printf("Double MP_Uninitialize: OK (no crash)\n");
+    SC_Uninitialize();
+    printf("Double SC_Uninitialize: OK (no crash)\n");
 
     return 0;
 }

@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "mp_internal.h"
-#include "mp_monitor.h"
+#include "sc_internal.h"
+#include "sc_monitor.h"
 
 
 static BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC /*hdc*/, LPRECT /*lpRect*/, LPARAM lParam) 

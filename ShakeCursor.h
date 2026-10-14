@@ -2,10 +2,10 @@
 
 #include <Windows.h>
 
-#ifdef MOUSEPOSITIONING_EXPORTS
-#define MOUSEPOS_API __declspec(dllexport)
+#ifdef SHAKECURSOR_EXPORTS
+#define SHAKECURSOR_API __declspec(dllexport)
 #else
-#define MOUSEPOS_API __declspec(dllimport)
+#define SHAKECURSOR_API __declspec(dllimport)
 #endif
 
 #ifdef __cplusplus
@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 // @config
-typedef struct MP_Config
+typedef struct SC_Config
 {
     UINT    cbSize;                 // 用于 ABI 版本识别
     int     shakeThresholdPixels;   // 摇晃检测：两次采样间距离阈值（像素），默认 130
@@ -25,41 +25,41 @@ typedef struct MP_Config
     int     edgeZoneWidth;          // 边缘死角检测带宽度（像素），默认 20
     int     crossScreenOffset;      // 自动跨屏后光标偏移量（像素），默认 40
     LPCWSTR cursorFilePath;         // 自定义大光标文件路径（.cur），NULL 则使用 DLL 内嵌资源
-} MP_Config;
+} SC_Config;
 
 // @callback event
-typedef enum MP_EventType
+typedef enum SC_EventType
 {
-    MP_EVENT_CURSOR_ENLARGED    = 1,    // 光标已放大（检测到摇晃手势）
-    MP_EVENT_CURSOR_RESTORED    = 2,    // 光标已恢复正常
-    MP_EVENT_AUTO_CROSS_SCREEN  = 3,    // 已触发自动跨屏，lParam = 目标显示器索引
-} MP_EventType;
+    SC_EVENT_CURSOR_ENLARGED    = 1,    // 光标已放大（检测到摇晃手势）
+    SC_EVENT_CURSOR_RESTORED    = 2,    // 光标已恢复正常
+    SC_EVENT_AUTO_CROSS_SCREEN  = 3,    // 已触发自动跨屏，lParam = 目标显示器索引
+} SC_EventType;
 
 // @Callback function prototype
-//   eventType: MP_EventType
+//   eventType: SC_EventType
 //   lParam:    事件附加数据
 //   userData:  用户自定义上下文指针
-typedef void (CALLBACK *MP_Callback)(int eventType, LPARAM lParam, LPVOID userData);
+typedef void (CALLBACK *SC_Callback)(int eventType, LPARAM lParam, LPVOID userData);
 
 //@init
 //@param config
-MOUSEPOS_API BOOL  MP_Initialize(const MP_Config* config);
+SHAKECURSOR_API BOOL  SC_Initialize(const SC_Config* config);
 
 //@uninit
-MOUSEPOS_API void  MP_Uninitialize(void);
+SHAKECURSOR_API void  SC_Uninitialize(void);
 
-//@enable MP
-MOUSEPOS_API void  MP_EnableMousePositioning(BOOL enable);
+//@enable SC
+SHAKECURSOR_API void  SC_EnableShakeCursor(BOOL enable);
 
 //@enable CrossScreen
-MOUSEPOS_API void  MP_EnableAutoCrossScreen(BOOL enable);
+SHAKECURSOR_API void  SC_EnableAutoCrossScreen(BOOL enable);
 
 //@query status
-MOUSEPOS_API BOOL  MP_IsMousePositioningEnabled(void);
-MOUSEPOS_API BOOL  MP_IsAutoCrossScreenEnabled(void);
+SHAKECURSOR_API BOOL  SC_IsShakeCursorEnabled(void);
+SHAKECURSOR_API BOOL  SC_IsAutoCrossScreenEnabled(void);
 
 //@Callback
-MOUSEPOS_API void  MP_SetCallback(MP_Callback callback, LPVOID userData);
+SHAKECURSOR_API void  SC_SetCallback(SC_Callback callback, LPVOID userData);
 
 #ifdef __cplusplus
 }

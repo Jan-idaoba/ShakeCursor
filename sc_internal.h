@@ -1,21 +1,21 @@
 #pragma once
 
 #include "pch.h"
-#include "MousePositioning.h"
+#include "ShakeCursor.h"
 #include <vector>
 
 // 系统光标条目数
-#define MP_SYSTEM_CURSOR_COUNT 13
+#define SC_SYSTEM_CURSOR_COUNT 13
 
 extern HINSTANCE g_hDllInstance;
 
 // ---- 内部自定义消息号 ----
 // 用于 PostThreadMessage 到工作线程
-#define WM_MP_ENABLE_POSITIONING    (WM_APP + 1)   // wParam = BOOL enable
-#define WM_MP_ENABLE_CROSSSCREEN    (WM_APP + 2)   // wParam = BOOL enable
-#define WM_MP_SHAKE_DETECTED        (WM_APP + 3)   // 检测到摇晃手势
-#define WM_MP_EDGE_HIT              (WM_APP + 4)   // wParam = MAKEWPARAM(x, y), lParam = edgeIndex
-#define WM_MP_MONITORS_CHANGED      (WM_APP + 5)   // 显示器配置变化
+#define WM_SC_ENABLE_POSITIONING    (WM_APP + 1)   // wParam = BOOL enable
+#define WM_SC_ENABLE_CROSSSCREEN    (WM_APP + 2)   // wParam = BOOL enable
+#define WM_SC_SHAKE_DETECTED        (WM_APP + 3)   // 检测到摇晃手势
+#define WM_SC_EDGE_HIT              (WM_APP + 4)   // wParam = MAKEWPARAM(x, y), lParam = edgeIndex
+#define WM_SC_MONITORS_CHANGED      (WM_APP + 5)   // 显示器配置变化
 
 // ---- 内部显示器信息 ----
 struct InternalMonitorInfo {
@@ -31,7 +31,7 @@ struct EdgeZone {
 };
 
 // ---- 全局运行时状态 ----
-struct MPState {
+struct SCState {
     // 工作线程
     HANDLE  workerThread;
     DWORD   workerThreadId;
@@ -56,7 +56,7 @@ struct MPState {
 
     // 回调
     SRWLOCK     callbackLock;
-    MP_Callback callback;
+    SC_Callback callback;
     LPVOID      userData;
 
     HWND    notifyWnd;
@@ -66,7 +66,7 @@ struct MPState {
     UINT_PTR cursorResetTimer;
 
     // 放大光标缓存
-    HCURSOR bigCursors[MP_SYSTEM_CURSOR_COUNT];
+    HCURSOR bigCursors[SC_SYSTEM_CURSOR_COUNT];
     BOOL    cursorCacheBuilt;
 
     // GDI+
@@ -77,4 +77,4 @@ struct MPState {
     std::vector<EdgeZone>           edgeZones;
 };
 
-extern MPState g_state;
+extern SCState g_state;
